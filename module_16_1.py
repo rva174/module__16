@@ -24,12 +24,11 @@ async def read_adm():
 # Создаrv маршрут к страницам пользователей,
 # используя параметр в пути - "/user/{user_id}"
 @app.get("/user/{user_id}")
-#async def read_user(user_id):
-async def root(user_id):
+async def root(user_id: str):
     return {f"Вы вошли как пользователь № {user_id}"}
 
-# Создаем маршрут к страницам пользователей передавая данные
+# Создаем маршрут к страницам пользователей,передавая данные
 # в адресной строке - "/user"
 @app.get("/user")
-async def read_user(username, age):
+async def read_user(username: str, age: int):
     return {f"Информация о пользователе- Имя: {username}, Возраст: {age}"}
