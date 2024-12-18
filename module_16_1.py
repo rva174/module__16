@@ -14,21 +14,21 @@ app = FastAPI()
 @app.get("/")
 #async def root()
 async def main_page():
-    return {"message": "Главная страница"}
+    return "Главная страница"
 
 # Создаем маршрут к странице администратора
 @app.get("/user/admin")
 async def read_adm():
-    return {"message": "Вы вошли как администратор"}
+    return "Вы вошли как администратор"
 
 # Создаrv маршрут к страницам пользователей,
 # используя параметр в пути - "/user/{user_id}"
 @app.get("/user/{user_id}")
 async def root(user_id: str):
-    return {f"Вы вошли как пользователь № {user_id}"}
+    return f"Вы вошли как пользователь № {user_id}"
 
 # Создаем маршрут к страницам пользователей,передавая данные
 # в адресной строке - "/user"
 @app.get("/user")
 async def read_user(username: str, age: int):
-    return {f"Информация о пользователе- Имя: {username}, Возраст: {age}"}
+    return f"Информация о пользователе- Имя: {username}, Возраст: {age}"
