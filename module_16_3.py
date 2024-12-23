@@ -2,8 +2,7 @@
 # Задача "Имитация работы с БД"
 
 
-from fastapi import FastAPI, Path, HTTPException
-from pydantic import BaseModel
+from fastapi import FastAPI, Path
 from typing import Dict, Annotated
 
 app = FastAPI()
@@ -12,51 +11,33 @@ app = FastAPI()
 users = {'1': 'Имя: Example, возраст: 18'}
 
 
-class User(BaseModel):
-    username: str
-    age: int
-
-
 @app.get('/users')
-async def get_users():
+async def get_users()->dict:
     return users
 
 
 @app.post('/user/{username}/{age}')
-async def create_user(username: str, age: int):
-    # Проверка на корректность возраста
-    if age < 18:
-        raise HTTPException(status_code=400, detail="Возраст должен быть е меньше 18")
-
-    # Находим следующий доступный ID
-    new_id = str(max(map(int, users.keys())) + 1)
-
-    # Добавляем нового пользователя
-    users[new_id] = f"Имя: {username}, возраст: {age}"
-    return f"User {new_id} is registered"
-
+async def create_user(
+        username: Annotated[str, Path(min_length=2, max_length=15, description="Enter name")],
+        age: Annotated[int, Path(ge=18, le=120, description='Enter age')]
+):
+    new_id = str(int(max(users, key=int)) + 1)
+    users[new_id] = f'Имя: {username}, возраст: {age}'
+    return f'User {new_id} is registered'
 
 @app.put('/user/{user_id}/{username}/{age}')
-async def update_user(user_id: str, username: str, age: int):
-    # Проверка на существование пользователя
-    if user_id not in users:
-        raise HTTPException(status_code=404, detail="Пользователь не найден")
-
-    # Проверка на корректность возраста
-    if age < 18:
-        raise HTTPException(status_code=400, detail="Возраст должен быть е меньше 18")
-
-    # Обновляем данные
-    users[user_id] = f"Имя: {username}, возраст: {age}"
-    return f"The user {user_id} is updated"
-
+async def update_user(
+        user_id: Annotated[int, Path( description="Enter id")],
+        username: Annotated[str, Path(min_length=2, max_length=15, description="Enter name")],
+        age: Annotated[int, Path(ge=18, le=120, description="Enter age")]
+):
+    users[user_id] = f'Имя: {username}, возраст: {age}'
+    return f'The user {user_id} is updated'
 
 @app.delete('/user/{user_id}')
-async def delete_user(user_id: str):
-    # Проверка на существование пользователя
-    if user_id not in users:
-        raise HTTPException(status_code=404, detail="Пользователь не найден.")
+async def delete_user(
+        user_id: Annotated[int, Path(description="Enter id")]
+):
+    users.pop(str(user_id))
+    return f'User {user_id} is delete'
 
-    # Удаляем пользователя
-    del users[user_id]
-    return f"User {user_id} has been deleted"
